@@ -13,11 +13,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+
 @Slf4j
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+/**
+ * @author pz
+ * @version 2.3
+ * @E-mail 2919274153@qq.com
+ * @date 2018-5-17 15:01:06
+ */
 public class ApiInterface implements Serializable {
    // 方法名字
     private String methodName;
@@ -30,21 +37,30 @@ public class ApiInterface implements Serializable {
     // 角色信息
     private Map<String, String> roleInfo=new HashMap<>();
 
+    // 角色信息
+    private Map<String, String> authInfo=new HashMap<>();
+
     //   权限信息
-    private  Map<String,  Map<String, String>> authInfo=new HashMap<>();
+    private  Map<String,  Map<String, String>> roleAndAuthInfo=new HashMap<>();
 
 
     public Stream<Map<String, String>> getsRole(){
         return Stream.of(roleInfo);
     }
-    public Stream< Map<String,  Map<String, String>>> getsAuth(){
+    public Stream<Map<String, String>> getsAuth(){
         return Stream.of(authInfo);
+    }
+    public Stream< Map<String,  Map<String, String>>> getsRoleAndAuthInfo(){
+        return Stream.of(roleAndAuthInfo);
     }
     public void setsAuthInfo(MygetRoles sRole){
         authInfo.putAll(sRole.roleOrAuth());
     }
     public void setsRoleInfo(MygetRoles sRole){
         roleInfo.putAll(sRole.roleOrAuth());
+    }
+    public void setsRoleAndAuthInfo(MygetRoles sRole){
+        roleAndAuthInfo.putAll(sRole.roleOrAuth());
     }
 
     public boolean isInfoEquals(){

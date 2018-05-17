@@ -1,10 +1,5 @@
 package com.pz.auth.common.enums;
 
-
-
-
-
-
 import com.pz.auth.common.Snowflake.SnowflakeIdWorker;
 import com.pz.auth.common.Snowflake.Snowflakes;
 
@@ -12,12 +7,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+/**
+ * @author pz
+ * @version 2.3
+ * @E-mail 2919274153@qq.com
+ * @date 2018-5-17 15:01:17
+ */
 public enum Jurisdiction {
 
     SAVE("save","增加"),UPDATE("update","修改"),DELETE("delete","删除"),LISR("list","集合"),SELECT("select","查询");
     static SnowflakeIdWorker idWorker=Snowflakes.of();
-
 
     private String jurName;
 

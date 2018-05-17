@@ -22,9 +22,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
+/**
+ * @author pz and wanna
+ * @version 2.3
+ * @E-mail 2919274153@qq.com
+ * @date 2018-5-17 14:59:41
+ */
 @Slf4j
- class ApiService {
-
+class ApiService {
 
     /**
      * 获取被 Description 注解的所有接口.
@@ -49,11 +54,18 @@ import java.util.stream.Stream;
         return interfaces;
     }
 
-    // 添加 Controller 的接口. 只包含有 Description 注解的接口,倘若返回是String,ModelAndView 等时,不能加该注解
+
+    /**
+     * 添加 Controller 的接口. 只包含有 Control 注解的接口,倘若返回是String,ModelAndView 等时,不能加该注解
+     *
+     * @param interfaces api对象信息集合
+     * @param clazz      扫描的类对象
+     * @throws ClassNotFoundException
+     */
     private void addInterface(List<ApiInterface> interfaces, Class clazz) throws ClassNotFoundException {
         // 获取类注解 RequestMapping 的映射路径
-        String prefix = getControllerPrefix(clazz);
-        // 获取类中 public 且含有 Description 的方法
+//        String prefix = getControllerPrefix(clazz);
+        // 获取类中 public 且含有 Control 的方法
         Set<Method> methods = PackageUtil.findAnnotationMethods(clazz, Control.class);
         // 遍历所有方法,有目标注解的就解析到接口列表中 interfaces
         for (Method method : methods) {
@@ -63,21 +75,21 @@ import java.util.stream.Stream;
             function.setMethodName(name);
             //  根据注解类型分组
             Map<Annotation, List<Annotation>> collect = annotations.stream().collect(Collectors.groupingBy(o -> o, Collectors.toList()));
-            collect.forEach((k, v) ->{
+            collect.forEach((k, v) -> {
                 //原来的 逻辑  获取Control 里面的数据
-                if(k instanceof  Control){
+                if (k instanceof Control) {
                     getControlInfo(v, function);
                 }
                 //
-                if(k instanceof  MyRole){
+                if (k instanceof MyRole) {
                     getMyRoleInfo(v, function);
                 }
 
-                if(k instanceof MyAuth ){
-                    getMyAuthInfo(v,function);
+                if (k instanceof MyAuth) {
+                    getMyAuthInfo(v, function);
                 }
 
-            } );
+            });
             //  如果 角色权限信息跟名字相等就增加，否则不增加,,
             if (function.isInfoEquals()) {
                 interfaces.add(function);
@@ -89,41 +101,50 @@ import java.util.stream.Stream;
         annotations.stream()
                 .filter(a -> a instanceof MyAuth)
                 .forEach(a -> {
-//                    //  添加权限信息
-//                    function.setsAuthInfo(() ->
-//
-//                    );
+                    //  添加权限信息
+                    MyAuth a1 = (MyAuth) a;
+                    //  如果设置了 isAll  属性 并且等于true
+                        if(a1.isAll()){
+                            function.getsRoleAndAuthInfo().forEach(m -> m.forEach((s, stringStringMap) -> stringStringMap.putAll(getMyAuthCollect(a1))));
+                        }
+                     function.setsAuthInfo(()->
+                             getMyAuthCollect(a1)
+                      );
+
                 });
     }
+
+    private Map<String, String> getMyAuthCollect(MyAuth a1) {
+        return Stream.of(a1).collect(Collectors.toMap(MyAuth::value,MyAuth::name));
+    }
+
     private void getMyRoleInfo(List<Annotation> annotations, ApiInterface function) {
         annotations.stream()
                 .filter(a -> a instanceof MyRole)
                 .forEach(a -> {
-                    //  添加角色信息
+                    //  添加单个角色信息
                     function.setsRoleInfo(() ->
-                           getMyRoleCollect((MyRole) a)
-
+                            getMyRoleCollect((MyRole) a)
                     );
-                    //  添加权限信息
-                    function.setsAuthInfo(() ->
-                            getMyAuthCollect((MyRole) a)
+                    //  添加单个权限信息
+                    function.setsRoleAndAuthInfo(() ->
+                            getMyRoleAndAuthCollect((MyRole) a)
                     );
                 });
     }
-
 
 
     private void getControlInfo(List<Annotation> annotations, ApiInterface function) {
         annotations.stream()
                 .filter(a -> a instanceof Control)
                 .forEach(a -> {
-                    //  添加角色信息
+                    //  添加多个角色信息
                     function.setsRoleInfo(() ->
-                         getMyRoleCollect(((Control) a).value())
+                            getMyRoleCollect(((Control) a).value())
                     );
-                    //  添加权限信息
-                    function.setsAuthInfo(() ->
-                            getMyAuthCollect(((Control) a).value())
+                    //  添加多个权限信息
+                    function.setsRoleAndAuthInfo(() ->
+                            getMyRoleAndAuthCollect(((Control) a).value())
                     );
                 });
     }
@@ -136,11 +157,12 @@ import java.util.stream.Stream;
 
 
     /**
-     *    传入一个或则多个MyRole对象进行处理
-     * @param a  反射获取的一个或者多个@MyRole对象
-     * @return 返回一个map<value,name> 对象
+     * 传入一个或则多个MyRole对象进行处理
+     *
+     * @param a 反射获取的一个或者多个@MyRole对象
+     * @return 返回一个map<value   ,   name> 对象
      */
-    private Map<String, HashMap> getMyAuthCollect(MyRole... a) {
+    private Map<String, HashMap> getMyRoleAndAuthCollect(MyRole... a) {
         return Stream.of(a)
                 .filter(myRole -> myRole.value().length != 0)
                 .collect(Collectors.toMap(MyRole::info, myRole ->

@@ -2,7 +2,7 @@ package com.pz.auth.common.Snowflake;
 
 public class Snowflakes {
 
-   public static SnowflakeIdWorker of(){
+    public static SnowflakeIdWorker of(){
         return  new SnowflakeIdWorker();
     }
 

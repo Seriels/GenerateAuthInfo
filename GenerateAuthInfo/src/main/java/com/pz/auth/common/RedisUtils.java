@@ -2,6 +2,7 @@ package com.pz.auth.common;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -19,8 +20,8 @@ import java.util.stream.Stream;
  * @version 2.3
  * @date 2018-5-16 16:09:29
  */
+@Slf4j
 public class RedisUtils {
-    private Logger logger=LoggerFactory.getLogger(this.getClass().getName());
 
     JedisConnectionFactory jedisConnectionFactory;
 
@@ -73,7 +74,7 @@ public class RedisUtils {
                 return bytes;
             }
         } catch (Exception e) {
-            logger.error("getObject获取redis键值异常:key=" + key + " cause:" + e);
+            log.error("getObject获取redis键值异常:key=" + key + " cause:" + e);
         } finally {
             returnResource(jedis1);
         }
@@ -94,7 +95,7 @@ public class RedisUtils {
                 return JSONObject.parseObject(bytes,t);
             }
         } catch (Exception e) {
-            logger.error("get T 获取redis键值异常:key=" + key + " cause:" + e);
+            log.error("get T 获取redis键值异常:key=" + key + " cause:" + e);
             return  null;
         } finally {
             returnResource(jedis1);
@@ -118,7 +119,7 @@ public class RedisUtils {
                 return JSONObject.parseObject(bytes,t);
             }
         } catch (Exception e) {
-            logger.error("get T 获取redis键值异常:key=" + key + " cause:" + e);
+            log.error("get T 获取redis键值异常:key=" + key + " cause:" + e);
             return  null;
         } finally {
             returnResource(jedis1);
@@ -140,7 +141,7 @@ public class RedisUtils {
             Jedis  jedis = (Jedis) jedis1.getNativeConnection();
             return jedis.set(key, JSON.toJSONString(value));
         } catch (Exception e) {
-            logger.error("setObject设置redis键值异常:key=" + key + " value=" + value + " cause:" + e);
+            log.error("setObject设置redis键值异常:key=" + key + " value=" + value + " cause:" + e);
             return null;
         } finally {
             returnResource(jedis1);
@@ -158,7 +159,7 @@ public class RedisUtils {
             }
             return result;
         } catch (Exception e) {
-            logger.error("setObject设置redis键值异常:key=" + key + " value=" + value + " cause:" + e);
+            log.error("setObject设置redis键值异常:key=" + key + " value=" + value + " cause:" + e);
         } finally {
             returnResource(jedis1);
         }
@@ -187,10 +188,10 @@ public class RedisUtils {
             Jedis  jedis = (Jedis) jedis1.getNativeConnection();
             result = jedis.hset(key,hash, value instanceof String ?(String) value:JSON.toJSONString(value));
             UpExpiretime(key, expiretime, Optional.ofNullable(result), jedis);
-            logger.error("hset设置redis键值成功:key=" + key  + " hash=" + hash + " value=" + value);
+            log.error("hset设置redis键值成功:key=" + key  + " hash=" + hash + " value=" + value);
             return result;
         } catch (Exception e) {
-            logger.error("hset设置redis键值异常:key=" + key  + " hash=" + hash +  " value=" + value + " cause:" + e);
+            log.error("hset设置redis键值异常:key=" + key  + " hash=" + hash +  " value=" + value + " cause:" + e);
         } finally {
             returnResource(jedis1);
         }
@@ -216,7 +217,7 @@ public class RedisUtils {
                return Optional.ofNullable(result);
            }
         } catch (Exception e) {
-            logger.error("hget获取redis键值异常:key=" + key  + " hash=" + hash + "  cause:" + e);
+            log.error("hget获取redis键值异常:key=" + key  + " hash=" + hash + "  cause:" + e);
         } finally {
             returnResource(jedis1);
         }
@@ -235,7 +236,7 @@ public class RedisUtils {
             UpExpiretime(key, expiretime,  Optional.ofNullable(stringStringMap), jedis);
             return stringStringMap;
         } catch (Exception e) {
-            logger.error("hget获取redis键值异常:key=" + key   + " cause:" + e);
+            log.error("hget获取redis键值异常:key=" + key   + " cause:" + e);
         } finally {
             returnResource(jedis1);
         }
@@ -254,10 +255,10 @@ public class RedisUtils {
             Jedis  jedis = (Jedis) jedis1.getNativeConnection();
             result = jedis.sadd(key,collect.stream().map(Object::toString).toArray(String[]::new));
             UpExpiretime(key, expiretime,  Optional.ofNullable(result), jedis);
-            logger.error("sadd设置redis键值成功:key=" + key + " value=" + arg);
+            log.error("sadd设置redis键值成功:key=" + key + " value=" + arg);
             return result;
         } catch (Exception e) {
-            logger.error("sadd设置redis键值异常:key=" + key  +  " value=" + arg + " cause:" + e);
+            log.error("sadd设置redis键值异常:key=" + key  +  " value=" + arg + " cause:" + e);
         } finally {
             returnResource(jedis1);
         }
@@ -279,7 +280,7 @@ public class RedisUtils {
             return lrange1;
         } catch (Exception e) {
             e.fillInStackTrace();
-            logger.error(String.format("smembers  获取redis键值异常:key=%s cause:%s", key, e));
+            log.error(String.format("smembers  获取redis键值异常:key=%s cause:%s", key, e));
         } finally {
             returnResource(jedis1);
         }
@@ -339,7 +340,7 @@ public class RedisUtils {
             return keys;
         } catch (Exception e) {
             e.fillInStackTrace();
-            logger.error(String.format("keys  获取redis键值异常:key=%s cause:%s", key, e));
+            log.error(String.format("keys  获取redis键值异常:key=%s cause:%s", key, e));
         } finally {
             returnResource(jedis1);
         }

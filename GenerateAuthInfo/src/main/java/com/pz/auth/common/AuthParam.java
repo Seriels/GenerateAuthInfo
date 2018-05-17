@@ -2,8 +2,13 @@ package com.pz.auth.common;
 
 
 
-import java.io.Serializable;
 
+/**
+ * @author pz
+ * @version 2.3
+ * @E-mail 2919274153@qq.com
+ * @date 2018-5-17 15:00:50
+ */
 public class AuthParam {
 
     /**  root user */
