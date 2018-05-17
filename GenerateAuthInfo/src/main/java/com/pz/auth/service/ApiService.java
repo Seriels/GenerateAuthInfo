@@ -2,8 +2,6 @@ package com.pz.auth.service;
 
 import com.pz.auth.annotation.Control;
 import com.pz.auth.annotation.MyAuth;
-
-
 import com.pz.auth.annotation.MyRole;
 import com.pz.auth.common.ApiInterface;
 import com.pz.auth.common.PackageUtil;
